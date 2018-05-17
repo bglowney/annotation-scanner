@@ -8,6 +8,53 @@
     <artifactId>annotation-scanner</artifactId>
     <version>0.1.0</version>
 
+    <name>Annotation Scanner</name>
+    <description>Utility for scanning the classpath by annotation</description>
+    <url>https://github.com/bglowney/annotation-scanner</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://github.com/bglowney/annotation-scanner/blob/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/bglowney/annotation-scanner</url>
+    </scm>
+
+    <!--
+        At least one developer entry is required for release to central
+    -->
+    <developers>
+        <developer>
+            <id>bglowney</id>
+            <name>Ben Glowney</name>
+            <email>benjaminglowney@gmail.com</email>
+            <organization>Ben Glowney</organization>
+            <organizationUrl>https://github.com/bglowney</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>-7</timezone>
+        </developer>
+    </developers>
+
+    <!--
+        Deploy to the central repository
+    -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
@@ -24,6 +71,106 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.5</version>
+            </plugin>
+
+            <!--
+                Deploy to the OSSRH
+
+                Release with `mvn clean deploy`
+
+                https://help.sonatype.com/repomanager2
+            -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <!-- should match server entry in settings.xml -->
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+
+            <!--
+                Release to maven central
+                (requires autoReleaseAfterClose=true)
+
+                mvn release:clean release:prepare
+
+                then
+
+                mvn release:perform
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>
+
+            <!--
+                Attach sources with the distributed jar
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                Attach javadoc with the distributed jar
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+                Sign the distributed jar
+
+                Before running maven clean install you need to set
+
+                export GPG=$(tty)
+
+                https://github.com/keybase/keybase-issues/issues/2798-
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -44,5 +191,11 @@
         </dependency>
 
     </dependencies>
+
+    <!--
+        Signing this artifact
+        1. Follow these instructions to create a key to authenticate yourself: http://central.sonatype.org/pages/working-with-pgp-signatures.html
+        2. Upload either with gpg or at https://pgp.mit.edu/pks/add (to export key run `gpg -armor -export you@example.com` ), see https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/4/html/Step_by_Step_Guide/s1-gnupg-export.html
+    -->
 
 </project>
