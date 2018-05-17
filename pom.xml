@@ -4,7 +4,7 @@
 
     <groupId>io.github.bglowney</groupId>
     <artifactId>annotation-scanner</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2-SNAPSHOT</version>
 
     <name>Annotation Scanner</name>
     <description>Utility for scanning the classpath by annotation</description>
@@ -22,7 +22,7 @@
         <connection>scm:git:https://github.com/bglowney/annotation-scanner.git</connection>
         <developerConnection>scm:git:https://github.com/bglowney/annotation-scanner.git</developerConnection>
         <url>https://github.com/bglowney/annotation-scanner</url>
-      <tag>0.1.1</tag>
+      <tag>0.1.0</tag>
   </scm>
 
     <!--
